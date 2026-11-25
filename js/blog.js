@@ -303,11 +303,14 @@ function renderBlogPost() {
         </nav>`;
   mount.innerHTML = `
   <section class="hero hero--sub hero--plain">
-    <div class="container post-hero">
-      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="blog.html">Blog</a><span>/</span><span>${p.category}</span></nav>
-      <p class="post-meta post-meta--dark">${metaLine(p)}</p>
-      <h1>${p.title}</h1>
-      <p class="hero-lead">${p.excerpt}</p>
+    <div class="container post-hero hero-grid">
+      <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="blog.html">Blog</a><span>/</span><span>${p.category}</span></nav>
+        <p class="post-meta post-meta--dark">${metaLine(p)}</p>
+        <h1>${p.title}</h1>
+        <p class="hero-lead">${p.excerpt}</p>
+      </div>
+      <figure class="hero-unit"><img src="assets/tankless-product.png" alt="The Tankless wall-mounted water heater" width="486" height="433" fetchpriority="high"></figure>
     </div>
   </section>
 

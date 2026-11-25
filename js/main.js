@@ -38,6 +38,7 @@ const SITE = {
     { label: "Installation", href: "installation.html", id: "installation" },
     { label: "Repair", href: "repair.html", id: "repair" },
     { label: "Zero Maintenance", href: "maintenance.html", id: "maintenance" },
+    { label: "About Us", href: "about.html", id: "about" },
     { label: "Blog", href: "blog.html", id: "blog" },
     { label: "Contact", href: "#contact", id: "contact" }
   ],
@@ -47,7 +48,7 @@ const SITE = {
     { label: "Zero Maintenance", href: "maintenance.html" }
   ],
   company: [
-    { label: "About Us", href: "https://thetankless.ca/about-us/" },
+    { label: "About Us", href: "about.html" },
     { label: "Blog", href: "blog.html" },
     { label: "Contact Us", href: "https://thetankless.ca/contact-us/" }
   ],
@@ -76,7 +77,17 @@ const ICONS = {
   pin: svg('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
   clock: svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
   star: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>',
-  check: svg('<path d="M20 6 9 17l-5-5"/>')
+  check: svg('<path d="M20 6 9 17l-5-5"/>'),
+  maple: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5l1.9 3.7 2-1-.9 6.3 3-3.1.7 1.6 3.1-.7-1.1 3.7 1.6.8-5.4 4.2.6 1.8-5-.8.2 4.5h-1.4l.2-4.5-5 .8.6-1.8-5.4-4.2 1.6-.8-1.1-3.7 3.1.7.7-1.6 3 3.1-.9-6.3 2 1z"/></svg>',
+  bolt: svg('<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>'),
+  drop: svg('<path d="M12 2.7 17.7 8.4a8 8 0 1 1-11.4 0z"/>'),
+  expand: svg('<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>'),
+  wifi: svg('<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a15 15 0 0 1 20 0M12 20h.01"/>'),
+  refresh: svg('<path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12A9 9 0 0 1 18.5 5.8L21 8M21 3v5h-5M3 21v-5h5"/>'),
+  wrench: svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>'),
+  headset: svg('<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>'),
+  shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'),
+  tag: svg('<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><path d="M7 7h.01"/>')
 };
 
 const LOGO = `
@@ -380,15 +391,20 @@ function initTabs() {
 }
 
 /* Testimonial slider with dots, arrows, swipe and autoplay */
-function initSlider() {
-  const root = $(".testimonials");
+function initSlider(root = $(".testimonials"), opts = {}) {
   if (!root) return;
   const track = $(".t-track", root);
-  const cards = $$(".t-card", track);
+  const cards = $$(opts.slide || ".t-card", track);
+  if (!cards.length) return;
   const dotsWrap = $(".t-dots", root);
   let index = 0, timer;
 
-  const perView = () => (window.innerWidth <= 640 ? 1 : window.innerWidth <= 960 ? 2 : 3);
+  const perView = opts.perView || (() => (window.innerWidth <= 640 ? 1 : window.innerWidth <= 960 ? 2 : 3));
+  const sizeSlides = () => {
+    if (!opts.perView) return;
+    const n = perView(), gap = parseFloat(getComputedStyle(track).gap) || 0;
+    cards.forEach(c => { c.style.flex = `0 0 calc((100% - ${gap * (n - 1)}px) / ${n})`; });
+  };
   const maxIndex = () => Math.max(0, cards.length - perView());
 
   const buildDots = () => {
@@ -409,7 +425,7 @@ function initSlider() {
   };
   const next = () => go(index >= maxIndex() ? 0 : index + 1);
   const prev = () => go(index <= 0 ? maxIndex() : index - 1);
-  const restart = () => { clearInterval(timer); if (!prefersReducedMotion) timer = setInterval(next, 6000); };
+  const restart = () => { clearInterval(timer); if (opts.mobileOnly && !window.matchMedia(opts.mobileOnly).matches) return; if (!prefersReducedMotion) timer = setInterval(next, 6000); };
 
   $("[data-prev]", root)?.addEventListener("click", () => { prev(); restart(); });
   $("[data-next]", root)?.addEventListener("click", () => { next(); restart(); });
@@ -426,8 +442,8 @@ function initSlider() {
   });
 
   let rt;
-  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { buildDots(); go(index); }, 150); });
-  buildDots(); go(0); restart();
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { sizeSlides(); buildDots(); go(index); restart(); }, 150); });
+  sizeSlides(); buildDots(); go(0); restart();
 }
 
 /* Sizing estimator
@@ -589,13 +605,15 @@ function initVideos() {
   $$("[data-video-showcase]").forEach(box => {
     const v = $("video", box);
     const overlay = $(".video-play", box);
-    if (box.hasAttribute("data-autoplay") && !prefersReducedMotion) {
+    if (box.hasAttribute("data-autoplay")) {
       v.muted = true; v.loop = true; v.controls = false;
       box.classList.add("is-auto");
-      const start = () => v.play().catch(() => box.classList.remove("is-auto"));
+      /* No play button: if the browser blocks autoplay, retry on the first touch/scroll/click */
+      const start = () => { if (!prefersReducedMotion) v.play().catch(() => {}); };
+      ["pointerdown", "touchstart", "scroll", "keydown"].forEach(ev => addEventListener(ev, () => { if (v.paused && box.dataset.visible !== "0") start(); }, { once: true, passive: true }));
       start();
       if ("IntersectionObserver" in window) {
-        new IntersectionObserver(([e]) => { e.isIntersecting ? start() : v.pause(); }, { threshold: 0.15 }).observe(box);
+        new IntersectionObserver(([e]) => { box.dataset.visible = e.isIntersecting ? "1" : "0"; e.isIntersecting ? start() : v.pause(); }, { threshold: 0.15 }).observe(box);
       }
       return;
     }
@@ -646,6 +664,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAccordion();
   initTabs();
   initSlider();
+  initSlider($("[data-posts-carousel]"), { slide: ".post-card", perView: () => 1, mobileOnly: "(max-width: 760px)" });
   initCalculator();
   initForms();
   initRipple();

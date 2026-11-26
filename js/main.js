@@ -33,17 +33,13 @@ const SITE = {
   email: "support@thetankless.ca",
   address: "301 Bradwick Drive, Vaughan, ON L4K 1K5",
   support: "24/7/365 support",
-  // "Services" dropdown in the header
-  start: [
-    { label: "Tankless Installation", note: "New unit or tank-to-tankless upgrade", href: "installation.html", id: "installation" },
-    { label: "Tankless Repair", note: "Diagnosis and repair", href: "repair.html", id: "repair" },
-    { label: "Zero Maintenance", note: "Why there is no yearly service visit", href: "maintenance.html", id: "maintenance" },
-    { label: "Get a Free Quote", note: "Tell us about your home", href: "#contact", id: "quote" }
-  ],
+  // Header menu, in order. The "Contact Us" button always comes last.
   nav: [
+    { label: "Installation", href: "installation.html", id: "installation" },
+    { label: "Repair", href: "repair.html", id: "repair" },
+    { label: "Zero Maintenance", href: "maintenance.html", id: "maintenance" },
     { label: "About Us", href: "about.html", id: "about" },
-    { label: "Blog", href: "blog.html", id: "blog" },
-    { label: "Contact", href: "#contact", id: "contact" }
+    { label: "Blog", href: "blog.html", id: "blog" }
   ],
   services: [
     { label: "Tankless Installation", href: "installation.html" },
@@ -71,9 +67,6 @@ const SITE = {
 /* ---------- 2. Icons (inline SVG, stroke = currentColor) ---------- */
 const svg = (d, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
 const ICONS = {
-  down: svg('<path d="m6 9 6 6 6-6"/>'),
-  search: svg('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
-  close: svg('<path d="M18 6 6 18M6 6l12 12"/>'),
   contract: svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9.5 12.500l5 5M14.5 12.500l-5 5"/>'),
   steps: svg('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m8.500 14 2.500 2.500 4.500-5"/>'),
   arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
@@ -132,41 +125,20 @@ function renderHeader() {
   const links = SITE.nav.map(n =>
     `<a href="${n.href}" class="nav-link${n.id === page ? " is-active" : ""}" ${current(n.id)}>${n.label}</a>`
   ).join("");
-  const startItems = SITE.start.map(s =>
-    `<li><a href="${s.href}" ${current(s.id)}><strong>${s.label}</strong><span>${s.note}</span></a></li>`
-  ).join("");
-  // The round button calls when SITE.phone is set, and emails until then
-  const contact = SITE.phone
-    ? { href: SITE.phoneHref, label: `Call ${SITE.phone}`, icon: ICONS.phone }
-    : { href: `mailto:${SITE.email}`, label: `Email ${SITE.email}`, icon: ICONS.mail };
-
   mount.outerHTML = `
   <div class="scroll-progress" aria-hidden="true"></div>
   <header class="site-header" id="top">
     <div class="header-pill">
       <a href="index.html" class="logo" aria-label="${SITE.name} home">${logoHTML()}</a>
       <nav class="nav" id="site-nav" aria-label="Main">
-        <div class="nav-group">
-          <button type="button" class="nav-start" aria-expanded="false" aria-controls="start-menu">Services ${ICONS.down}</button>
-          <ul class="nav-menu" id="start-menu" hidden>${startItems}</ul>
-        </div>
         ${links}
+        <a href="#contact" class="nav-cta">Contact Us</a>
       </nav>
       <div class="header-actions">
-        <button type="button" class="icon-btn" data-search-open aria-label="Search the site" aria-haspopup="dialog">${ICONS.search}</button>
-        <a class="icon-btn icon-btn--accent" href="${contact.href}" aria-label="${contact.label}">${contact.icon}</a>
         <button type="button" class="icon-btn nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
       </div>
     </div>
-  </header>
-  <dialog class="search-dialog" aria-label="Search the site">
-    <div class="search-head">
-      <input type="search" placeholder="Search The Tankless" aria-label="Search The Tankless" autocomplete="off">
-      <button type="button" class="icon-btn" data-search-close aria-label="Close search">${ICONS.close}</button>
-    </div>
-    <ul class="search-results"></ul>
-    <p class="search-empty" role="status" hidden></p>
-  </dialog>`;
+  </header>`;
 }
 
 function renderFooter() {
@@ -317,77 +289,23 @@ function initScrollUI() {
   update();
 }
 
-/* Navigation: "Services" dropdown and mobile menu */
+/* Mobile navigation */
 function initNav() {
   const toggle = $(".nav-toggle");
   const nav = $("#site-nav");
-  const start = $(".nav-start");
-  const menu = $("#start-menu");
-  if (!toggle || !nav || !start || !menu) return;
-  const setStart = open => {
-    menu.hidden = !open;
-    start.setAttribute("aria-expanded", open);
-  };
+  if (!toggle || !nav) return;
   const setOpen = open => {
     document.body.classList.toggle("nav-open", open);
     toggle.setAttribute("aria-expanded", open);
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-    if (!open) setStart(false);
   };
-  start.addEventListener("click", () => setStart(menu.hidden));
   toggle.addEventListener("click", () => setOpen(!document.body.classList.contains("nav-open")));
-  nav.addEventListener("click", e => { if (e.target.closest("a")) { setStart(false); setOpen(false); } });
-  document.addEventListener("click", e => {
-    if (!e.target.closest(".nav-group")) setStart(false);
-    if (!e.target.closest(".header-pill")) setOpen(false);
-  });
-  start.parentElement.addEventListener("focusout", e => {
-    if (e.relatedTarget && !start.parentElement.contains(e.relatedTarget)) setStart(false);
-  });
+  nav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+  document.addEventListener("click", e => { if (!e.target.closest(".header-pill")) setOpen(false); });
   document.addEventListener("keydown", e => {
-    if (e.key !== "Escape") return;
-    if (!menu.hidden) { setStart(false); start.focus(); }
-    else if (document.body.classList.contains("nav-open")) { setOpen(false); toggle.focus(); }
+    if (e.key === "Escape" && document.body.classList.contains("nav-open")) { setOpen(false); toggle.focus(); }
   });
   window.addEventListener("resize", () => { if (window.innerWidth > 960) setOpen(false); });
-}
-
-/* Header search: matches the pages below plus every blog post in js/blog.js */
-function initSearch() {
-  const dialog = $(".search-dialog");
-  const opener = $("[data-search-open]");
-  if (!dialog || !opener) return;
-  const input = $("input", dialog);
-  const list = $(".search-results", dialog);
-  const empty = $(".search-empty", dialog);
-  const pages = [
-    { title: "Home", note: "Tankless water heaters in Ontario", href: "index.html", words: "models sizing calculator comparison hard water" },
-    { title: "Tankless Installation", note: "New unit or tank-to-tankless upgrade", href: "installation.html", words: "install replacement upgrade" },
-    { title: "Tankless Repair", note: "Diagnosis and repair", href: "repair.html", words: "fix leak error code no hot water" },
-    { title: "Zero Maintenance", note: "Why there is no yearly service visit", href: "maintenance.html", words: "descaling scale flush" },
-    { title: "About Us", note: "Who we are", href: "about.html", words: "company canadian" },
-    { title: "Blog", note: "Guides and articles", href: "blog.html", words: "articles guides" },
-    { title: "Get a Free Quote", note: "Contact the team", href: "#contact", words: "contact email consultation price" }
-  ];
-  const posts = (typeof POSTS === "undefined" ? [] : POSTS).map(p =>
-    ({ title: p.title, note: p.excerpt, href: postUrl(p), words: p.category }));
-  const all = [...pages, ...posts];
-  const render = () => {
-    const query = input.value.trim();
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const hits = terms.length
-      ? all.filter(i => { const text = `${i.title} ${i.note} ${i.words}`.toLowerCase(); return terms.every(t => text.includes(t)); })
-      : pages;
-    list.innerHTML = hits.map(i => `<li><a href="${i.href}"><strong>${i.title}</strong><span>${i.note}</span></a></li>`).join("");
-    list.hidden = !hits.length;
-    empty.hidden = hits.length > 0;
-    empty.textContent = hits.length ? "" : `Nothing matches "${query}". Try a shorter word, or email ${SITE.email}.`;
-  };
-  opener.addEventListener("click", () => { input.value = ""; render(); dialog.showModal(); input.focus(); });
-  input.addEventListener("input", render);
-  input.addEventListener("keydown", e => { if (e.key === "Enter") $("a", list)?.click(); });
-  $("[data-search-close]", dialog).addEventListener("click", () => dialog.close());
-  dialog.addEventListener("click", e => { if (e.target === dialog || e.target.closest("a")) dialog.close(); });
 }
 
 /* Scroll reveal: add data-reveal (+ optional ="left|right|zoom" and data-delay) */
@@ -754,7 +672,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initScrollUI();
   initNav();
-  initSearch();
   initReveal();
   initCounters();
   initAccordion();

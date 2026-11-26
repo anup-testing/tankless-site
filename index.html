@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en-CA">
+<html lang="en-CA" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tankless Water Heaters in Ontario | The Tankless</title>
   <meta name="description" content="Reliable hot water on demand with an efficient tankless system designed for modern Canadian homes. Installation, repair and zero-maintenance tankless water heaters in Ontario.">
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,401,500,700,701&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
   <link rel="icon" href="assets/favicon.png" type="image/png">
-  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="preload" as="image" href="assets/hero-poster.jpg" fetchpriority="high">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/blog.js" defer></script>
   <script src="js/main.js" defer></script>
@@ -20,9 +21,15 @@
 
   <main id="main">
     <!-- ================= HERO (video background) ================= -->
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
+    <section class="vhero">
+      <div class="vhero-media">
+        <video data-bg-video autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg" width="720" height="1280" aria-hidden="true">
+          <source src="https://thetankless.ca/wp-content/uploads/2026/05/the-Tankless.mp4" type="video/mp4">
+        </video>
+        <button type="button" class="video-toggle" aria-label="Pause background video"></button>
+      </div>
+      <div class="container">
+        <div class="vhero-copy">
           <h1 data-reveal data-delay=".08">Powerful Hot Water. <span class="accent">Smarter Efficiency.</span></h1>
           <p class="hero-lead" data-reveal data-delay=".16">Enjoy reliable hot water on demand with an efficient tankless system designed for modern Canadian homes. Compact, intelligent and built to deliver consistent comfort whenever you need it.</p>
           <div class="btn-row" data-reveal data-delay=".24">
@@ -33,12 +40,6 @@
             <div><span data-icon="check"></span>Never descale again</div>
             <div><span data-icon="check"></span>Zero maintenance required</div>
             <div><span data-icon="check"></span>Canadian owned and operated</div>
-          </div>
-        </div>
-
-        <div class="hero-product" data-reveal="zoom" data-delay=".2">
-          <div class="media-frame">
-            <img src="https://thetankless.ca/wp-content/uploads/2026/11/cd0683c861fb384084634f4f0f01bed3194a7e1b.webp" alt="The Tankless wall-mounted tankless water heater" width="940" height="1080" fetchpriority="high">
           </div>
         </div>
       </div>
@@ -59,10 +60,9 @@
     <!-- ================= ZERO MAINTENANCE ================= -->
     <section class="section section--white" id="zero-maintenance">
       <div class="container split">
-        <div class="video-showcase" data-video-showcase data-autoplay data-reveal="left">
-          <video autoplay muted loop playsinline preload="auto" poster="https://thetankless.ca/wp-content/uploads/2026/11/cd0683c861fb384084634f4f0f01bed3194a7e1b.webp"><source src="https://thetankless.ca/wp-content/uploads/2026/05/the-Tankless.mp4" type="video/mp4"></video>
-          <button class="video-play" aria-label="Play video"><span class="play-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" fill="currentColor"/></svg></span><span class="video-caption"><strong>Install once. Enjoy endlessly.</strong><small>No tank to drain · No anode rod · No yearly service visit</small></span></button>
-        </div>
+        <figure class="media-frame media-frame--square" data-reveal="left">
+          <img src="https://thetankless.ca/wp-content/uploads/2026/11/cd0683c861fb384084634f4f0f01bed3194a7e1b.webp" alt="The Tankless wall-mounted tankless water heater" width="940" height="1080" loading="lazy">
+        </figure>
         <div data-reveal="right">
           <span class="eyebrow">Never descale. No maintenance.</span>
           <h2>Zero Maintenance Required</h2>
@@ -125,7 +125,8 @@
         </div>
         <div data-reveal="right">
           <div class="hardness-map">
-            <img src="assets/ontario-map.png" alt="Map of Ontario regions" width="543" height="416" loading="lazy">
+            <img class="map-dark" src="assets/ontario-map.png" alt="Map of Ontario regions" width="543" height="416" loading="lazy">
+            <img class="map-light" src="assets/ontario-map-light.png" alt="Map of Ontario regions" width="543" height="416" loading="lazy">
             <div aria-hidden="true">
             <span class="pin pin--slight" style="--x:29.9%;--y:37.6%;--ring:17.4%"><i></i><b>Slightly Hard</b></span>
             <span class="pin pin--very" style="--x:55%;--y:59.6%;--ring:12.1%"><i></i><b>Very Hard</b></span>
@@ -232,7 +233,7 @@
             <span class="eyebrow">Your estimate</span>
             <div class="gauge">
               <svg viewBox="0 0 190 190" aria-hidden="true">
-                <defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1ea7ff"/><stop offset="1" stop-color="#1ea7ff"/></linearGradient></defs>
+                <defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E9BE8"/><stop offset="1" stop-color="#1E9BE8"/></linearGradient></defs>
                 <circle class="track" cx="95" cy="95" r="80"/>
                 <circle class="bar" cx="95" cy="95" r="80"/>
               </svg>

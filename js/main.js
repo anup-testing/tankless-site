@@ -308,6 +308,14 @@ function initNav() {
   window.addEventListener("resize", () => { if (window.innerWidth > 960) setOpen(false); });
 }
 
+/* Rotating image borders: run only for images that are on screen */
+function initRings() {
+  const frames = $$(".media-frame, .photo-frame, .video-showcase, .about-banner, .about-photo, .card-media, .model-card, .post-card-media, .post-cover, .post-feature-media");
+  if (!("IntersectionObserver" in window)) { frames.forEach(el => el.classList.add("is-live")); return; }
+  const io = new IntersectionObserver(entries => entries.forEach(e => e.target.classList.toggle("is-live", e.isIntersecting)));
+  frames.forEach(el => io.observe(el));
+}
+
 /* Scroll reveal: add data-reveal (+ optional ="left|right|zoom" and data-delay) */
 function initReveal() {
   const items = $$("[data-reveal], .step");
@@ -672,6 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initScrollUI();
   initNav();
+  initRings();
   initReveal();
   initCounters();
   initAccordion();

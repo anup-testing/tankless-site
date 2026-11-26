@@ -1462,3 +1462,20 @@ html[data-theme="light"] body main .hero.hero--sub:not(.about-hero) { background
 /* seven menu entries: tighten the spacing on narrower desktops */
 @media (min-width: 961px) and (max-width: 1100px) { .header-pill .nav-link { padding-inline: .65rem; } .header-pill .nav-cta { margin-left: .25rem; padding-inline: 1.125rem; } }
 
+/* =====================================================================
+   Section images: 1px brand-colour border with a light travelling round it.
+   Turns only while on screen (see initRings) and stays still for
+   visitors who reduce motion. Cut-out product images have no border.
+   ===================================================================== */
+@property --ring-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+:root { --ring: conic-gradient(from var(--ring-angle), rgba(30, 155, 232, .6) 0 45%, var(--brand) 62%, #8fd3ff 76%, #ffffff 82%, #8fd3ff 86%, var(--brand) 92%, rgba(30, 155, 232, .6)); }
+.media-frame, .photo-frame, .video-showcase, .about-banner, .card-media, .model-card, .post-card-media, .post-cover, .post-feature-media { position: relative; }
+.media-frame, .photo-frame, .video-showcase, .about-banner, .model-card, .post-cover, .post-feature-media { border-radius: var(--radius-lg); }
+.card-media, .post-card-media { border-radius: var(--radius); }
+:is(.media-frame, .photo-frame, .video-showcase, .about-banner, .card-media, .model-card, .post-card-media, .post-cover, .post-feature-media)::after { content: ""; position: absolute; z-index: 3; inset: 0; padding: 1px; border-radius: inherit; pointer-events: none; background: var(--ring); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; animation: ring-turn 6s linear infinite paused; }
+/* the About photo is a bare <img>, so the border shows through 1px of padding */
+.about-photo { padding: 1px; background: var(--ring); animation: ring-turn 6s linear infinite paused; }
+.is-live::after, .about-photo.is-live { animation-play-state: running; }
+@keyframes ring-turn { to { --ring-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) { :is(.media-frame, .photo-frame, .video-showcase, .about-banner, .card-media, .model-card, .post-card-media, .post-cover, .post-feature-media)::after, .about-photo { animation: none; } }
+

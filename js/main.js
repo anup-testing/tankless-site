@@ -14,7 +14,7 @@
 const MEDIA_BASE = "https://thetankless.ca/wp-content/uploads";
 const MEDIA = {
   logo: "assets/the-tankless-logo.png", // white-on-transparent; needs a dark background
-  video: `${MEDIA_BASE}/2026/05/the-Tankless.mp4`,
+  video: "assets/hero.mp4",   // compressed, silent copy of the-Tankless.mp4 for fast mobile playback
   zeroMaint: `${MEDIA_BASE}/2026/11/cd0683c861fb384084634f4f0f01bed3194a7e1b.webp`,
   install: `${MEDIA_BASE}/2026/10/installation-services.webp`,
   product: `${MEDIA_BASE}/2026/09/download-1.png`,
@@ -33,7 +33,7 @@ const SITE = {
   email: "support@thetankless.ca",
   address: "301 Bradwick Drive, Vaughan, ON L4K 1K5",
   support: "24/7/365 support",
-  // "Get Started" dropdown in the header
+  // "Services" dropdown in the header
   start: [
     { label: "Tankless Installation", note: "New unit or tank-to-tankless upgrade", href: "installation.html", id: "installation" },
     { label: "Tankless Repair", note: "Diagnosis and repair", href: "repair.html", id: "repair" },
@@ -74,6 +74,8 @@ const ICONS = {
   down: svg('<path d="m6 9 6 6 6-6"/>'),
   search: svg('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
   close: svg('<path d="M18 6 6 18M6 6l12 12"/>'),
+  contract: svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9.5 12.500l5 5M14.5 12.500l-5 5"/>'),
+  steps: svg('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m8.500 14 2.500 2.500 4.500-5"/>'),
   arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
   left: svg('<path d="M15 18l-6-6 6-6"/>'),
   right: svg('<path d="M9 18l6-6-6-6"/>'),
@@ -145,7 +147,7 @@ function renderHeader() {
       <a href="index.html" class="logo" aria-label="${SITE.name} home">${logoHTML()}</a>
       <nav class="nav" id="site-nav" aria-label="Main">
         <div class="nav-group">
-          <button type="button" class="nav-start" aria-expanded="false" aria-controls="start-menu">Get Started ${ICONS.down}</button>
+          <button type="button" class="nav-start" aria-expanded="false" aria-controls="start-menu">Services ${ICONS.down}</button>
           <ul class="nav-menu" id="start-menu" hidden>${startItems}</ul>
         </div>
         ${links}
@@ -315,7 +317,7 @@ function initScrollUI() {
   update();
 }
 
-/* Navigation: "Get Started" dropdown and mobile menu */
+/* Navigation: "Services" dropdown and mobile menu */
 function initNav() {
   const toggle = $(".nav-toggle");
   const nav = $("#site-nav");
@@ -673,17 +675,27 @@ function initVideos() {
   const pause = svg('<path d="M8 5v14M16 5v14"/>');
   $$("video[data-bg-video]").forEach(v => {
     v.muted = true;
-    if (prefersReducedMotion) { v.removeAttribute("autoplay"); v.pause(); }
+    let inView = true;
+    let loaded = document.readyState === "complete";
+    /* The video starts only after the page has loaded, so it never delays the first paint */
+    const autoPlay = () => { if (loaded && inView && !prefersReducedMotion && v.dataset.userPaused !== "true") v.play().catch(() => {}); };
+    if (!loaded) window.addEventListener("load", () => { loaded = true; autoPlay(); }, { once: true });
     const btn = v.parentElement.querySelector(".video-toggle");
     const sync = () => { if (btn) { btn.innerHTML = v.paused ? play : pause; btn.setAttribute("aria-label", v.paused ? "Play background video" : "Pause background video"); } };
     btn?.addEventListener("click", () => { v.paused ? v.play() : v.pause(); v.dataset.userPaused = v.paused; sync(); });
     v.addEventListener("play", sync); v.addEventListener("pause", sync); sync();
+    /* Some phones (low power or data saver modes) block autoplay: start on the first tap instead */
+    const retry = e => {
+      if (v.paused && !e.target.closest?.(".video-toggle")) autoPlay();
+    };
+    ["touchend", "click"].forEach(ev => document.addEventListener(ev, retry, { passive: true }));
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(([e]) => {
-        if (v.dataset.userPaused === "true" || prefersReducedMotion) return;
-        e.isIntersecting ? v.play().catch(() => {}) : v.pause();
+        inView = e.isIntersecting;
+        inView ? autoPlay() : v.pause();
       }, { threshold: 0.1 }).observe(v);
     }
+    autoPlay();
   });
   $$("[data-video-showcase]").forEach(box => {
     const v = $("video", box);
@@ -694,8 +706,8 @@ function initVideos() {
       /* No play button: if the browser blocks autoplay, retry on the first touch/scroll/click */
       const start = () => { if (!prefersReducedMotion) v.play().catch(() => {}); };
       ["pointerdown", "touchstart", "scroll", "keydown"].forEach(ev => addEventListener(ev, () => { if (v.paused && box.dataset.visible !== "0") start(); }, { once: true, passive: true }));
-      start();
-      if ("IntersectionObserver" in window) {
+      if (!("IntersectionObserver" in window)) start();
+      else {
         new IntersectionObserver(([e]) => { box.dataset.visible = e.isIntersecting ? "1" : "0"; e.isIntersecting ? start() : v.pause(); }, { threshold: 0.15 }).observe(box);
       }
       return;

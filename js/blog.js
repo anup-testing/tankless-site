@@ -310,7 +310,7 @@ function renderBlogPost() {
         <h1>${p.title}</h1>
         <p class="hero-lead">${p.excerpt}</p>
       </div>
-      <figure class="hero-unit"><img src="assets/tankless-product.png" alt="The Tankless wall-mounted water heater" width="486" height="433" fetchpriority="high"></figure>
+      <figure class="hero-unit"><img src="assets/tankless-unit.png" alt="The Tankless wall-mounted water heater" width="288" height="496" fetchpriority="high"></figure>
     </div>
   </section>
 
